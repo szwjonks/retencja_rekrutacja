@@ -47,7 +47,7 @@ import { UserRow, UserRowFromApi } from 'src/types/user-data';
 import { useRouter } from 'vue-router';
 import useUserData from 'src/composable/useUserData';
 import { getUsersList } from 'src/services/api.service';
-import FavouriteState from './FavouriteState.vue';
+import FavouriteState from '../components/FavouriteState.vue';
 
 const router = useRouter();
 
@@ -102,5 +102,3 @@ onMounted(async () => {
   apiRowsData.value = await getUsersList();
 });
 </script>
-
-<style scoped lang="scss"></style>

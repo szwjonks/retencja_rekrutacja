@@ -12,7 +12,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { UserRowFromApi } from 'src/types/user-data';
 import { getUserDetails } from 'src/services/api.service';
-import UserDetailsPresentation from './UserDetailsPresentation.vue';
+import UserDetailsPresentation from '../components/UserDetailsPresentation.vue';
 
 const route = useRoute();
 

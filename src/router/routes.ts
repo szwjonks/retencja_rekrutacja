@@ -9,12 +9,12 @@ const routes: RouteRecordRaw[] = [
       {
         name: 'users',
         path: '/users',
-        component: () => import('components/UsersList.vue'),
+        component: () => import('src/pages/UsersList.vue'),
       },
       {
         name: 'user',
         path: '/user/:id',
-        component: () => import('components/UserDetails.vue'),
+        component: () => import('src/pages/UserDetails.vue'),
       },
     ],
   },
