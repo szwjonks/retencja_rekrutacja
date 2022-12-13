@@ -6,6 +6,7 @@
       :columns="columns"
       row-key="name"
       :filter="search"
+      dense
     >
       <template #top-right>
         <q-input dense debounce="400" color="primary" v-model="search">
