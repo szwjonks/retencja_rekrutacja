@@ -7,7 +7,7 @@
       row-key="name"
       :filter="search"
     >
-      <template #top>
+      <template #top-right>
         <q-input dense debounce="400" color="primary" v-model="search">
           <template #append>
             <q-icon name="search" />
@@ -21,16 +21,19 @@
       </template>
       <template #body-cell-favourite="props">
         <q-td :props="props">
-          <input
-            type="checkbox"
-            :checked="props.row.favourite"
-            @change="updateFavourite(props.row)"
+          <FavouriteState
+            :user-data="props.row"
+            @change="changeFavouriteState(props.row, $event)"
           />
         </q-td>
       </template>
       <template #body-cell-details="props">
         <q-td :props="props">
-          <button @click="goToDetails(props.row)">Go to details</button>
+          <q-btn
+            color="primary"
+            label="Go to details"
+            @click="goToDetails(props.row)"
+          />
         </q-td>
       </template>
     </q-table>
@@ -40,9 +43,13 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
 import { QTableProps } from 'quasar';
-import { api } from 'src/boot/axios';
-import { useStorage } from '@vueuse/core';
-import { UserRow, UserRowFromApi, UsersApiResponse } from 'src/types/user-data';
+import { UserRow, UserRowFromApi } from 'src/types/user-data';
+import { useRouter } from 'vue-router';
+import useUserData from 'src/composable/useUserData';
+import { getUsersList } from 'src/services/api.service';
+import FavouriteState from './FavouriteState.vue';
+
+const router = useRouter();
 
 const columns: QTableProps['columns'] = [
   {
@@ -72,34 +79,27 @@ const columns: QTableProps['columns'] = [
   },
 ];
 
-const favourites = useStorage<Record<number, boolean>>('favourites', {});
+const { mapToUserData, changeFavouriteState } = useUserData();
 
 const apiRowsData = ref<UserRowFromApi[]>([]);
+
 const rows = computed<UserRow[]>(() => {
-  return apiRowsData.value.map((row) => ({
-    ...row,
-    name: `${row.first_name} ${row.last_name}`,
-    favourite: favourites.value[row.id] || false,
-  }));
+  return apiRowsData.value.map(mapToUserData);
 });
+
 const search = ref('');
 
-const updateFavourite = (row: UserRow) => {
-  favourites.value[row.id] = !row.favourite;
-};
-
 const goToDetails = (row: UserRow) => {
-  console.log('go to details: ', row.id);
+  router.push({
+    name: 'user',
+    params: {
+      id: row.id,
+    },
+  });
 };
 
 onMounted(async () => {
-  const config = {
-    params: {
-      per_page: 12,
-    },
-  };
-  const usersResponse = await api.get<UsersApiResponse>('users', config);
-  apiRowsData.value = usersResponse.data.data;
+  apiRowsData.value = await getUsersList();
 });
 </script>
 

@@ -13,3 +13,7 @@ export interface UserRow extends UserRowFromApi {
 export interface UsersApiResponse {
   data: UserRowFromApi[];
 }
+
+export interface UserDetailsApiResponse {
+  data: UserRowFromApi;
+}
