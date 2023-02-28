@@ -1,6 +1,9 @@
 <template>
   <div class="user-details__wrapper">
-    <UserDetailsPresentation v-if="apiUserData" :api-user-data="apiUserData" />
+    <Suspense>
+      <UserCompAsync :userId="userId"></UserCompAsync>
+      <template #fallback> SUSPENSE </template>
+    </Suspense>
     <router-link to="/users" class="user-list-button">
       <q-btn color="primary" label="Go to users list" />
     </router-link>
@@ -8,18 +11,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
-import { UserRowFromApi } from 'src/types/user-data';
-import { getUserDetails } from 'src/services/api.service';
-import UserDetailsPresentation from '../components/UserDetailsPresentation.vue';
+import LoadingComponent from 'src/components/LoadingComponent.vue';
+import { pause } from 'src/utils/functions';
 
 const route = useRoute();
+const userId = Number(route.params.id);
 
-const apiUserData = ref<UserRowFromApi | null>(null);
-
-onMounted(async () => {
-  apiUserData.value = await getUserDetails(Number(route.params.id));
+const UserCompAsync = defineAsyncComponent({
+  loader: async () => {
+    await pause();
+    return import('../components/UserDetailsPresentation.vue');
+  },
+  loadingComponent: LoadingComponent,
+  delay: 200,
+  suspensible: userId % 2 == 0,
 });
 </script>
 
